@@ -1,0 +1,7 @@
+
+# robots.txt for http://towingnearme.us  
+User-agent: *
+Disallow: /*
+
+Disallow: /api/*
+     
