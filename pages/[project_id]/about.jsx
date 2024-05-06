@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import Rightbar from "@/components/containers/Rightbar";
 import Head from "next/head";
 import MarkdownIt from "markdown-it";
+import { useRouter } from "next/router";
 
 const myFont = Montserrat({ subsets: ["cyrillic"] });
 const font2 = Cormorant({ subsets: ["cyrillic"] });
@@ -17,15 +18,16 @@ const font2 = Cormorant({ subsets: ["cyrillic"] });
 export default function About({ logo, about_me }) {
   const markdownIt = new MarkdownIt();
   const content = markdownIt.render(about_me);
+  const router = useRouter();
+  const { project_id } = router.query;
 
-  console.log(about_me);
   return (
     <div className={myFont.className}>
       <Head>
         <title>Next 14 Template</title>
       </Head>
       <Navbar
-        logo={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/industry_template_images/${process.env.NEXT_PUBLIC_TEMPLATE_ID}/${logo.file_name}`}
+        logo={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/project_images/${project_id}/${logo.file_name}`}
       />
       <AboutBanner />
       <FullContainer>
@@ -54,22 +56,19 @@ export default function About({ logo, about_me }) {
   );
 }
 
-export async function getStaticProps() {
+export async function getServerSideProps(context) {
+  const { params } = context;
   const _logo = await fetch(
-    `${
-      process.env.NEXT_PUBLIC_SITE_MANAGER
-    }/api/public/industry_template_data/${
-      process.env.NEXT_PUBLIC_INDUSTRY_ID
-    }/${process.env.NEXT_PUBLIC_TEMPLATE_ID}/data/${"logo"}`
+    `${process.env.NEXT_PUBLIC_SITE_MANAGER}/api/public/project_data/${
+      params.project_id
+    }/data/${"logo"}`
   );
   const logo = await _logo.json();
 
   const _about_me = await fetch(
-    `${
-      process.env.NEXT_PUBLIC_SITE_MANAGER
-    }/api/public/industry_template_data/${
-      process.env.NEXT_PUBLIC_INDUSTRY_ID
-    }/${process.env.NEXT_PUBLIC_TEMPLATE_ID}/data/${"about_me"}`
+    `${process.env.NEXT_PUBLIC_SITE_MANAGER}/api/public/project_data/${
+      params.project_id
+    }/data/${"about_me"}`
   );
   const about_me = await _about_me.json();
 

@@ -11,11 +11,20 @@ export default function Blog({
   className,
   author,
   date,
+  project_id,
 }) {
   return (
     <div className={className}>
       <BlogHead title={title} date={date} author={author} />
-      <Link href={title?.toLowerCase().replaceAll(" ", "-")}>
+      <Link
+        href={
+          project_id
+            ? `/${project_id}/blogs/${title
+                ?.toLowerCase()
+                .replaceAll(" ", "-")}`
+            : `/blogs/${title?.toLowerCase().replaceAll(" ", "-")}`
+        }
+      >
         <div className="relative overflow-hidden w-full h-[60vh] mt-8">
           <Image
             src={image}
@@ -30,7 +39,7 @@ export default function Blog({
         </div>
       </Link>
       <p className="mt-3">{description}</p>
-      <Link href={title?.toLowerCase().replaceAll(" ", "-")}>
+      <Link href={`/blogs/${title?.toLowerCase().replaceAll(" ", "-")}`}>
         <Button className="mt-6">Read More</Button>
       </Link>
     </div>

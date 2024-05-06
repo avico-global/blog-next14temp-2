@@ -4,7 +4,7 @@ import Container from "../common/Container";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function LatestBlogs({ blogs }) {
+export default function LatestBlogs({ blogs, project_id }) {
   return (
     <FullContainer className="py-16 text-center">
       <Container>
@@ -17,8 +17,13 @@ export default function LatestBlogs({ blogs }) {
               author={item.author}
               date={item.published_at}
               tagline={item.tagline}
+              project_id={project_id}
               description={item.articleContent}
-              image={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/industry_template_images/${process.env.NEXT_PUBLIC_TEMPLATE_ID}/${item.image}`}
+              image={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${
+                project_id ? "project" : "industry_template"
+              }_images/${
+                project_id ? project_id : process.env.NEXT_PUBLIC_TEMPLATE_ID
+              }/${item.image}`}
             />
           ))}
         </div>
@@ -27,9 +32,15 @@ export default function LatestBlogs({ blogs }) {
   );
 }
 
-function BlogCard({ title, image, description }) {
+function BlogCard({ title, image, description, project_id }) {
   return (
-    <Link href={title?.toLowerCase().replaceAll(" ", "-")}>
+    <Link
+      href={
+        project_id
+          ? `/${project_id}/blogs/${title?.toLowerCase().replaceAll(" ", "-")}`
+          : `/blogs/${title?.toLowerCase().replaceAll(" ", "-")}`
+      }
+    >
       <div className="relative overflow-hidden w-full h-96 hover:opacity-80 transition-all">
         <Image
           src={image}
