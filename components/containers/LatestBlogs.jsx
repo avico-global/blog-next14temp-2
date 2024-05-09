@@ -4,7 +4,8 @@ import Container from "../common/Container";
 import Image from "next/image";
 import Link from "next/link";
 
-export default function LatestBlogs({ blogs, project_id }) {
+export default function LatestBlogs({ blogs, imagePath, project_id }) {
+  console.log("🚀 ~ LatestBlogs ~ imagePath:", imagePath)
   return (
     <FullContainer className="py-16 text-center">
       <Container>
@@ -19,11 +20,11 @@ export default function LatestBlogs({ blogs, project_id }) {
               tagline={item.tagline}
               project_id={project_id}
               description={item.articleContent}
-              image={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${
-                project_id ? "project" : "industry_template"
-              }_images/${
-                project_id ? project_id : process.env.NEXT_PUBLIC_TEMPLATE_ID
-              }/${item.image}`}
+              image={
+                item.image
+                  ? `${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${item.image}`
+                  : "/no-image.png"
+              }
             />
           ))}
         </div>
@@ -37,7 +38,7 @@ function BlogCard({ title, image, description, project_id }) {
     <Link
       href={
         project_id
-          ? `/${project_id}/blogs/${title?.toLowerCase().replaceAll(" ", "-")}`
+          ? `/blogs/${title?.toLowerCase().replaceAll(" ", "-")}?${project_id}`
           : `/blogs/${title?.toLowerCase().replaceAll(" ", "-")}`
       }
     >

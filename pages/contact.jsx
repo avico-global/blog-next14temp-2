@@ -9,16 +9,25 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import Map from "@/components/containers/Map";
+import {
+  callBackendApi,
+  getDomain,
+  getImagePath,
+  getProjectId,
+} from "@/lib/myFun";
 
 const myFont = Montserrat({ subsets: ["cyrillic"] });
 
-export default function Contact({ logo }) {
+export default function Contact({ logo, project_id, imagePath }) {
   return (
     <div className={myFont.className}>
       <Head>
         <title>Next 14 Template</title>
       </Head>
-      <Navbar logo={logo} />
+      <Navbar
+        logo={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${logo.file_name}`}
+        project_id={project_id}
+      />
       <FullContainer>
         <Container className="mt-16">
           <div className="grid grid-cols-1 md:grid-cols-contact gap-14 w-full">
@@ -49,19 +58,17 @@ export default function Contact({ logo }) {
   );
 }
 
-export async function getStaticProps() {
-  const _logo = await fetch(
-    `${
-      process.env.NEXT_PUBLIC_SITE_MANAGER
-    }/api/public/industry_template_data/${
-      process.env.NEXT_PUBLIC_INDUSTRY_ID
-    }/${process.env.NEXT_PUBLIC_TEMPLATE_ID}/data/${"logo"}`
-  );
-  const logo = await _logo.json();
+export async function getServerSideProps({ req, query }) {
+  const domain = getDomain(req?.headers?.host);
+  const imagePath = await getImagePath({ domain, query });
+  const project_id = getProjectId(query);
+  const logo = await callBackendApi({ domain, query, type: "logo" });
 
   return {
     props: {
-      logo: logo.data[0],
+      logo: logo.data[0] || null,
+      imagePath,
+      project_id,
     },
   };
 }

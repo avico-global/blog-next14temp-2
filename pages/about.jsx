@@ -10,13 +10,19 @@ import { cn } from "@/lib/utils";
 import Rightbar from "@/components/containers/Rightbar";
 import Head from "next/head";
 import MarkdownIt from "markdown-it";
+import {
+  callBackendApi,
+  getDomain,
+  getImagePath,
+  getProjectId,
+} from "@/lib/myFun";
 
 const myFont = Montserrat({ subsets: ["cyrillic"] });
 const font2 = Cormorant({ subsets: ["cyrillic"] });
 
-export default function About({ logo, about_me }) {
+export default function About({ logo, about_me, imagePath, project_id }) {
   const markdownIt = new MarkdownIt();
-  const content = markdownIt.render(about_me);
+  const content = markdownIt?.render(about_me||"");
 
   console.log(about_me);
   return (
@@ -25,7 +31,8 @@ export default function About({ logo, about_me }) {
         <title>Next 14 Template</title>
       </Head>
       <Navbar
-        logo={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/industry_template_images/${process.env.NEXT_PUBLIC_TEMPLATE_ID}/${logo.file_name}`}
+        logo={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${logo.file_name}`}
+        project_id={project_id}
       />
       <AboutBanner />
       <FullContainer>
@@ -54,29 +61,19 @@ export default function About({ logo, about_me }) {
   );
 }
 
-export async function getStaticProps() {
-  const _logo = await fetch(
-    `${
-      process.env.NEXT_PUBLIC_SITE_MANAGER
-    }/api/public/industry_template_data/${
-      process.env.NEXT_PUBLIC_INDUSTRY_ID
-    }/${process.env.NEXT_PUBLIC_TEMPLATE_ID}/data/${"logo"}`
-  );
-  const logo = await _logo.json();
-
-  const _about_me = await fetch(
-    `${
-      process.env.NEXT_PUBLIC_SITE_MANAGER
-    }/api/public/industry_template_data/${
-      process.env.NEXT_PUBLIC_INDUSTRY_ID
-    }/${process.env.NEXT_PUBLIC_TEMPLATE_ID}/data/${"about_me"}`
-  );
-  const about_me = await _about_me.json();
-
+export async function getServerSideProps({ req, query }) {
+  const domain = getDomain(req?.headers?.host);
+  const imagePath = await getImagePath({ domain, query });
+  const project_id = getProjectId(query);
+  const logo = await callBackendApi({ domain, query, type: "logo" });
+  const about_me = await callBackendApi({ domain, query, type: "about_me" });
+  console.log("🚀 ~ getServerSideProps ~ about_me:", about_me);
   return {
     props: {
-      logo: logo.data[0],
-      about_me: about_me.data[0].value,
+      logo: logo.data[0] || null,
+      about_me: about_me.data[0]?.length ? about_me.data[0]?.value : null,
+      imagePath,
+      project_id,
     },
   };
 }

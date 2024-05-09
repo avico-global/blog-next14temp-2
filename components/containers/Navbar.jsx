@@ -5,33 +5,32 @@ import Link from "next/link";
 import { Facebook, Instagram, Search, Twitter } from "lucide-react";
 import { useRouter } from "next/router";
 
-export default function Navbar({ logo }) {
+export default function Navbar({ logo, project_id }) {
   const router = useRouter();
-  const { project_id } = router.query;
 
   return (
     <>
       <div className="hidden md:flex items-center sticky top-0 bg-white z-20 shadow-sm justify-center py-3 gap-6 w-full border-b border-gray-100">
         <Link
-          href={project_id ? `/${project_id}` : "/"}
+          href={project_id ? `/?${project_id}` : "/"}
           className="uppercase text-sm"
         >
           home
         </Link>
         <Link
-          href={project_id ? `/${project_id}/${"about"}` : `/${"about"}`}
+          href={project_id ? `/${"about"}?${project_id}` : `/${"about"}`}
           className="uppercase text-sm"
         >
           About
         </Link>
         <Link
-          href={project_id ? `/${project_id}/${"contact"}` : `/${"contact"}`}
+          href={project_id ? `/${"contact"}?${project_id}` : `/${"contact"}`}
           className="uppercase text-sm"
         >
           contact
         </Link>
         <Link
-          href={project_id ? `/${project_id}/${"blogs"}` : `/${"blogs"}`}
+          href={project_id ? `${"/blogs"}?${project_id}` : `/${"blogs"}`}
           className="uppercase text-sm"
         >
           blogs
@@ -49,7 +48,7 @@ export default function Navbar({ logo }) {
             />
           </div>
           <div className="flex items-center lg:justify-center">
-            <Link href={project_id ? `/${project_id}` : "/"}>
+            <Link href={project_id ? `/?${project_id}` : "/"}>
               <Image
                 height={50}
                 width={170}

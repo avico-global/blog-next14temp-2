@@ -19,9 +19,9 @@ export default function Blog({
       <Link
         href={
           project_id
-            ? `/${project_id}/blogs/${title
+            ? `/blogs/${title
                 ?.toLowerCase()
-                .replaceAll(" ", "-")}`
+                .replaceAll(" ", "-")}?${project_id}`
             : `/blogs/${title?.toLowerCase().replaceAll(" ", "-")}`
         }
       >
@@ -39,7 +39,16 @@ export default function Blog({
         </div>
       </Link>
       <p className="mt-3">{description}</p>
-      <Link href={`/blogs/${title?.toLowerCase().replaceAll(" ", "-")}`}>
+      <Link
+        href={
+          project_id
+            ? `/blogs/${title
+                ?.toLowerCase()
+                .replaceAll(" ", "-")}?${project_id}`
+            : `/blogs/${title?.toLowerCase().replaceAll(" ", "-")}`
+        }
+        // href={`/blogs/${title?.toLowerCase().replaceAll(" ", "-")}`}
+      >
         <Button className="mt-6">Read More</Button>
       </Link>
     </div>
