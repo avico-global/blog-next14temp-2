@@ -5,7 +5,6 @@ import MostPopular from "@/components/containers/MostPopular";
 import Navbar from "@/components/containers/Navbar";
 import Footer from "@/components/containers/Footer";
 import Blog from "@/components/common/Blog";
-import { blogs } from "@/components/blogs";
 import Rightbar from "@/components/containers/Rightbar";
 import Head from "next/head";
 import { Montserrat } from "next/font/google";
@@ -53,7 +52,11 @@ export default function Home({
                   date={item.published_at}
                   tagline={item.tagline}
                   description={item.articleContent}
-                  image={item.image?`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${item.image}`:'/no-image.png'}
+                  image={
+                    item.image
+                      ? `${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${item.image}`
+                      : "/no-image.png"
+                  }
                   project_id={project_id}
                 />
               ))}

@@ -5,7 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function LatestBlogs({ blogs, imagePath, project_id }) {
-  console.log("🚀 ~ LatestBlogs ~ imagePath:", imagePath)
+  console.log("🚀 ~ LatestBlogs ~ imagePath:", imagePath);
   return (
     <FullContainer className="py-16 text-center">
       <Container>

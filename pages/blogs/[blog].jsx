@@ -57,8 +57,11 @@ export default function Blog({
           </div>
         </Container>
       </FullContainer>
-      <LatestBlogs blogs={blog_list} imagePath={imagePath}
-        project_id={project_id}/>
+      <LatestBlogs
+        blogs={blog_list}
+        imagePath={imagePath}
+        project_id={project_id}
+      />
       <Footer />
     </div>
   );
