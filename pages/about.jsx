@@ -4,7 +4,6 @@ import AboutBanner from "@/components/containers/AboutBanner";
 import Footer from "@/components/containers/Footer";
 import Navbar from "@/components/containers/Navbar";
 import React from "react";
-import { Montserrat } from "next/font/google";
 import { Cormorant } from "next/font/google";
 import { cn } from "@/lib/utils";
 import Rightbar from "@/components/containers/Rightbar";
@@ -17,7 +16,13 @@ import {
   getProjectId,
 } from "@/lib/myFun";
 
-const myFont = Montserrat({ subsets: ["cyrillic"] });
+import { Roboto } from "next/font/google";
+import GoogleTagManager from "@/lib/GoogleTagManager";
+import JsonLd from "@/components/json/JsonLd";
+const myFont = Roboto({
+  subsets: ["cyrillic"],
+  weight: ["400", "700"],
+});
 const font2 = Cormorant({ subsets: ["cyrillic"] });
 
 export default function About({
@@ -27,6 +32,7 @@ export default function About({
   project_id,
   categories,
   blog_list,
+  domain,
 }) {
   const markdownIt = new MarkdownIt();
   const content = markdownIt?.render(about_me.value || "");
@@ -34,7 +40,39 @@ export default function About({
   return (
     <div className={myFont.className}>
       <Head>
-        <title>Next 14 Template</title>
+        <meta charSet="UTF-8" />
+        <title>{meta?.title}</title>
+        <meta name="description" content={meta?.description} />
+        <link rel="author" href={`http://${domain}`} />
+        <link rel="publisher" href={`http://${domain}`} />
+        <link rel="canonical" href={`http://${domain}`} />
+        <meta name="robots" content="noindex" />
+        <meta name="theme-color" content="#008DE5" />
+        <link rel="manifest" href="/manifest.json" />
+        <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <GoogleTagManager />
+        <meta
+          name="google-site-verification"
+          content="zbriSQArMtpCR3s5simGqO5aZTDqEZZi9qwinSrsRPk"
+        />
+        <link
+          rel="apple-touch-icon"
+          sizes="180x180"
+          href={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${logo.file_name}`}
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="32x32"
+          href={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${logo.file_name}`}
+        />
+        <link
+          rel="icon"
+          type="image/png"
+          sizes="16x16"
+          href={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${logo.file_name}`}
+        />
       </Head>
       <Navbar
         blog_list={blog_list}
@@ -66,7 +104,61 @@ export default function About({
           </div>
         </Container>
       </FullContainer>
-      <Footer />
+      <Footer
+        blog_list={blog_list}
+        categories={categories}
+        logo={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${logo?.file_name}`}
+        project_id={project_id}
+        imagePath={imagePath}
+      />
+
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "WebPage",
+              "@id": `http://${domain}/`,
+              url: `http://${domain}/`,
+              name: meta?.title,
+              isPartOf: {
+                "@id": `http://${domain}`,
+              },
+              description: meta?.description,
+              inLanguage: "en-US",
+            },
+            {
+              "@type": "Organization",
+              "@id": `http://${domain}`,
+              name: domain,
+              url: `http://${domain}/`,
+              logo: {
+                "@type": "ImageObject",
+                url: `${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${logo.file_name}`,
+              },
+              sameAs: [
+                "http://www.facebook.com",
+                "http://www.twitter.com",
+                "http://instagram.com",
+              ],
+            },
+            {
+              "@type": "ItemList",
+              url: `http://${domain}`,
+              name: "blog",
+              itemListElement: blog_list?.map((blog, index) => ({
+                "@type": "ListItem",
+                position: index + 1,
+                item: {
+                  "@type": "Article",
+                  url: `http://${domain}/${blog?.article_category?.name}/${blog.key}`,
+                  name: blog.title,
+                },
+              })),
+            },
+          ],
+        }}
+      />
     </div>
   );
 }
@@ -92,6 +184,7 @@ export async function getServerSideProps({ req, query }) {
       blog_list: blog_list.data[0].value,
       project_id,
       categories: categories?.data[0]?.value || null,
+      domain,
     },
   };
 }

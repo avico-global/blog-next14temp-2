@@ -4,7 +4,6 @@ import Container from "../common/Container";
 import PopularPosts from "./PopularPosts";
 import LatestPosts from "./LatestPosts";
 import { Facebook, Instagram, Twitter } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -12,7 +11,6 @@ export default function Footer({
   category,
   categories,
   project_id,
-  logo,
   blog_list,
   imagePath,
 }) {
@@ -22,20 +20,12 @@ export default function Footer({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-14 w-full">
           <div>
             <p className="font-bold">About</p>
-            <div className="relative overflow-hidden w-full h-44 mt-5">
-              <Image
-                src={logo}
-                alt="Background Image"
-                height={200}
-                width={200}
-              />
-            </div>
-            <p className="text-white/90 mt-6 text-sm">
+            <p className="text-white/90 mt-6 text-lg">
               Sed ut in perspiciatis unde omnis iste natus error sit on i tatem
               accusantium doloremque laudan totam rem aperiam eaque.
             </p>
           </div>
-          <PopularPosts />
+          <PopularPosts blog_list={blog_list} imagePath={imagePath} />
           <LatestPosts blog_list={blog_list} imagePath={imagePath} />
         </div>
         <div className="flex items-center justify-center gap-2 text-gray-400 mt-14">

@@ -2,27 +2,9 @@ import React from "react";
 import FullContainer from "../common/FullContainer";
 import Container from "../common/Container";
 import Image from "next/image";
+import Link from "next/link";
 
-const blogs = [
-  {
-    title: "Mountain Snow Isn’t Holding Me Back This Time",
-    image:
-      "https://cheerup2.theme-sphere.com/bold/wp-content/uploads/sites/8/2016/05/anthony-delanoix-226168-1-1536x1024.jpg",
-  },
-  {
-    title: " A Serene Place For Deep Thinkers",
-    image:
-      "https://cheerup2.theme-sphere.com/bold/wp-content/uploads/sites/8/2016/05/MKF_5387-2048x1367.jpg",
-  },
-  ,
-  {
-    title: "My Very Minimal Interior Design Ideas",
-    image:
-      "https://cheerup2.theme-sphere.com/bold/wp-content/uploads/sites/8/2016/05/interiejer_12-2048x1365.jpg",
-  },
-];
-
-export default function MostPopular() {
+export default function MostPopular({ blog_list, imagePath, project_id }) {
   return (
     <FullContainer className="py-16 text-center">
       <Container className="border border-gray-100 px-3 py-9 md:px-9">
@@ -30,19 +12,50 @@ export default function MostPopular() {
           Most Popular
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full mt-11 mb-3">
-          {blogs.map((item, index) => (
-            <BlogCard key={index} title={item.title} image={item.image} />
-          ))}
+          {blog_list.map(
+            (item, index) =>
+              item.isPopular && (
+                <BlogCard
+                  key={index}
+                  title={item.title}
+                  author={item.author}
+                  date={item.published_at}
+                  tagline={item.tagline}
+                  description={item.articleContent}
+                  image={
+                    item.image
+                      ? `${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${item.image}`
+                      : "/no-image.png"
+                  }
+                  project_id={project_id}
+                  href={
+                    project_id
+                      ? `/${item?.article_category?.name}/${item.key}?${project_id}`
+                      : `/${item?.article_category?.name}/${item.key}`
+                  }
+                  category={item.article_category.name}
+                />
+              )
+          )}
         </div>
       </Container>
     </FullContainer>
   );
 }
 
-function BlogCard({ title, image }) {
+function BlogCard({
+  title,
+  image,
+  description,
+  className,
+  author,
+  date,
+  href,
+  category,
+}) {
   return (
     <div className="flex flex-col items-center text-center">
-      <div className="relative overflow-hidden w-full h-52">
+      <Link href={href || ""} className="relative overflow-hidden w-full h-52">
         <Image
           src={image}
           alt="Background Image"
@@ -52,11 +65,11 @@ function BlogCard({ title, image }) {
           sizes="400px, 300px"
           className="-z-10 w-full h-full object-cover absolute top-0"
         />
-      </div>
+      </Link>
       <p className="italic text-xs w-fit text-gray-400 mt-4">
         in
         <span className="uppercase text-yellow-600 font-medium ml-2 text-xs">
-          Lifestyle
+          {category}
         </span>
       </p>
       <h3 className="font-semibold mt-2 leading-5">{title}</h3>

@@ -4,7 +4,6 @@ import Footer from "@/components/containers/Footer";
 import Navbar from "@/components/containers/Navbar";
 import Head from "next/head";
 import React from "react";
-import { Montserrat } from "next/font/google";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -16,7 +15,11 @@ import {
   getProjectId,
 } from "@/lib/myFun";
 
-const myFont = Montserrat({ subsets: ["cyrillic"] });
+import { Roboto } from "next/font/google";
+const myFont = Roboto({
+  subsets: ["cyrillic"],
+  weight: ["400", "700"],
+});
 
 export default function Contact({
   logo,
@@ -61,7 +64,13 @@ export default function Contact({
           </div>
         </Container>
       </FullContainer>
-      <Footer />
+      <Footer
+        blog_list={blog_list}
+        categories={categories}
+        logo={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${logo?.file_name}`}
+        project_id={project_id}
+        imagePath={imagePath}
+      />
     </div>
   );
 }

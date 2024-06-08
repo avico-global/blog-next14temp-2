@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import FullContainer from "../common/FullContainer";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/router";
 import { Facebook, Instagram, Search, Twitter } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -13,6 +14,8 @@ export default function Navbar({
   category,
 }) {
   const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
+  const currentPath = router.asPath;
 
   const handleSearchChange = (event) => {
     setSearchQuery(event.target.value);
@@ -22,12 +25,17 @@ export default function Navbar({
     item?.title?.toLowerCase()?.includes(searchQuery?.toLowerCase())
   );
 
+  const isActive = (path) => currentPath === path;
+
   return (
     <>
       <div className="hidden md:flex items-center sticky top-0 bg-white z-20 shadow-sm justify-center w-full border-b border-gray-100">
         <Link
           href={project_id ? `/?${project_id}` : "/"}
-          className="uppercase text-sm p-3"
+          className={cn(
+            "uppercase text-sm p-3",
+            isActive("/") && "border-b-2 border-black"
+          )}
         >
           home
         </Link>
@@ -37,7 +45,8 @@ export default function Navbar({
             href={project_id ? `/${item}?${project_id}` : `/${item}`}
             className={cn(
               "uppercase text-sm p-3",
-              category === item && "border-b-2 border-black"
+              (category === item || isActive(`/${item}`)) &&
+                "border-b-2 border-black"
             )}
           >
             {item}
@@ -45,13 +54,19 @@ export default function Navbar({
         ))}
         <Link
           href={project_id ? `/${"about"}?${project_id}` : `/${"about"}`}
-          className="uppercase text-sm p-3"
+          className={cn(
+            "uppercase text-sm p-3",
+            isActive("/about") && "border-b-2 border-black"
+          )}
         >
           About
         </Link>
         <Link
           href={project_id ? `/${"contact"}?${project_id}` : `/${"contact"}`}
-          className="uppercase text-sm p-3"
+          className={cn(
+            "uppercase text-sm p-3",
+            isActive("/contact") && "border-b-2 border-black"
+          )}
         >
           contact
         </Link>

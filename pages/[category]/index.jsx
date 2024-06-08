@@ -34,8 +34,6 @@ export default function Categories({
   domain,
   categories,
   project_id,
-  footer_text,
-  copyright,
 }) {
   const router = useRouter();
   const { category } = router.query;
@@ -94,7 +92,7 @@ export default function Categories({
         <Container>
           <div className="w-full">
             <Breadcrumbs breadcrumbs={breadcrumbs} className="py-7" />
-            <p className="text-2xl font-semibold border-l-4 border-purple-400 capitalize px-4 py-1 mb-7">
+            <p className="text-2xl font-semibold border-l-4 border-primary capitalize px-4 py-1 mb-7">
               Browsing: {category}
             </p>
           </div>
@@ -148,11 +146,11 @@ export default function Categories({
         </Container>
       </FullContainer>
       <Footer
-        project_id={project_id}
-        footer_text={footer_text}
         blog_list={blog_list}
-        copyright={copyright}
-        logo={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${logo.file_name}`}
+        categories={categories}
+        logo={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${logo?.file_name}`}
+        project_id={project_id}
+        imagePath={imagePath}
       />
 
       <JsonLd
@@ -203,9 +201,7 @@ export default function Categories({
                 position: index + 1,
                 item: {
                   "@type": "Article",
-                  url: `http://${domain}/${blog.title
-                    ?.toLowerCase()
-                    .replaceAll(" ", "-")}`,
+                  url: `http://${domain}/${blog?.article_category?.name}/${blog.key}`,
                   name: blog.title,
                 },
               })),
