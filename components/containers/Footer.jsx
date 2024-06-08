@@ -5,8 +5,17 @@ import PopularPosts from "./PopularPosts";
 import LatestPosts from "./LatestPosts";
 import { Facebook, Instagram, Twitter } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
+import { cn } from "@/lib/utils";
 
-export default function Footer() {
+export default function Footer({
+  category,
+  categories,
+  project_id,
+  logo,
+  blog_list,
+  imagePath,
+}) {
   return (
     <FullContainer className="bg-black text-white py-16 mt-12">
       <Container>
@@ -15,7 +24,7 @@ export default function Footer() {
             <p className="font-bold">About</p>
             <div className="relative overflow-hidden w-full h-44 mt-5">
               <Image
-                src="https://zoya.qodeinteractive.com/wp-content/uploads/2021/04/user-img-1.png"
+                src={logo}
                 alt="Background Image"
                 height={200}
                 width={200}
@@ -27,20 +36,44 @@ export default function Footer() {
             </p>
           </div>
           <PopularPosts />
-          <LatestPosts />
+          <LatestPosts blog_list={blog_list} imagePath={imagePath} />
         </div>
         <div className="flex items-center justify-center gap-2 text-gray-400 mt-14">
           <Facebook className="w-5" />
           <Twitter className="w-5" />
           <Instagram className="w-5" />
         </div>
-        <div className="flex flex-col md:flex-row items-center justify-center gap-6 mt-8 font-semibold uppercase">
-          <p className="text-xs">Home</p>
-          <p className="text-xs">shop</p>
-          <p className="text-xs">lifestyle</p>
-          <p className="text-xs">fashion</p>
-          <p className="text-xs">about</p>
-          <p className="text-xs">contact</p>
+        <div className="flex flex-col md:flex-row items-center justify-center mt-8 font-semibold uppercase">
+          <Link
+            href={project_id ? `/?${project_id}` : "/"}
+            className="uppercase text-sm p-3"
+          >
+            home
+          </Link>
+          {categories?.map((item, index) => (
+            <Link
+              key={index}
+              href={project_id ? `/${item}?${project_id}` : `/${item}`}
+              className={cn(
+                "uppercase text-sm p-3",
+                category === item && "border-b-2 border-purple-500"
+              )}
+            >
+              {item}
+            </Link>
+          ))}
+          <Link
+            href={project_id ? `/${"about"}?${project_id}` : `/${"about"}`}
+            className="uppercase text-sm p-3"
+          >
+            About
+          </Link>
+          <Link
+            href={project_id ? `/${"contact"}?${project_id}` : `/${"contact"}`}
+            className="uppercase text-sm p-3"
+          >
+            contact
+          </Link>
         </div>
         <p className="mt-8 text-white/70 text-xs">
           © 2024 THEMESPHERE - ALL REGISTERED

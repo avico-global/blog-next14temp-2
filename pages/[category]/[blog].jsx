@@ -5,10 +5,10 @@ import Container from "@/components/common/Container";
 import Banner from "@/components/containers/Banner";
 import Navbar from "@/components/containers/Navbar";
 import Footer from "@/components/containers/Footer";
-import { Montserrat } from "next/font/google";
+import { useRouter } from "next/router";
 import MarkdownIt from "markdown-it";
-import Head from "next/head";
 import LatestBlogs from "@/components/containers/LatestBlogs";
+import Head from "next/head";
 import {
   callBackendApi,
   getDomain,
@@ -16,7 +16,11 @@ import {
   getProjectId,
 } from "@/lib/myFun";
 
-const myFont = Montserrat({ subsets: ["cyrillic"] });
+import { Roboto } from "next/font/google";
+const myFont = Roboto({
+  subsets: ["cyrillic"],
+  weight: ["400", "700"],
+});
 
 export default function Blog({
   logo,
@@ -24,7 +28,10 @@ export default function Blog({
   blog_list,
   project_id,
   imagePath,
+  categories,
 }) {
+  const router = useRouter();
+  const { category } = router.query;
   const markdownIt = new MarkdownIt();
   const content = markdownIt.render(myblog?.value.articleContent);
 
@@ -34,6 +41,9 @@ export default function Blog({
         <title>{myblog?.value.title} | Next 14 Template</title>
       </Head>
       <Navbar
+        blog_list={blog_list}
+        category={category}
+        categories={categories}
         logo={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${logo?.file_name}`}
         project_id={project_id}
       />
@@ -74,12 +84,17 @@ export async function getServerSideProps({ params, req, query }) {
   const blog = await callBackendApi({
     domain,
     query,
-    type: params.blog.replaceAll("-", "_"),
+    type: params.blog,
+  });
+  const categories = await callBackendApi({
+    domain,
+    query,
+    type: "categories",
   });
   const blog_list = await callBackendApi({ domain, query, type: "blog_list" });
 
   const isValidBlog = blog_list.data[0].value.some(
-    (item) => item.title.toLowerCase().replaceAll(" ", "-") === params.blog
+    (item) => item.key === params.blog
   );
 
   if (!isValidBlog) {
@@ -96,6 +111,7 @@ export async function getServerSideProps({ params, req, query }) {
       blog_list: blog_list.data[0].value,
       imagePath,
       project_id,
+      categories: categories?.data[0]?.value || null,
     },
   };
 }

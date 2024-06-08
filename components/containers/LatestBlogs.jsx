@@ -5,7 +5,6 @@ import Image from "next/image";
 import Link from "next/link";
 
 export default function LatestBlogs({ blogs, imagePath, project_id }) {
-  console.log("🚀 ~ LatestBlogs ~ imagePath:", imagePath);
   return (
     <FullContainer className="py-16 text-center">
       <Container>
@@ -18,12 +17,16 @@ export default function LatestBlogs({ blogs, imagePath, project_id }) {
               author={item.author}
               date={item.published_at}
               tagline={item.tagline}
-              project_id={project_id}
               description={item.articleContent}
               image={
                 item.image
                   ? `${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${item.image}`
                   : "/no-image.png"
+              }
+              href={
+                project_id
+                  ? `/${item.article_category.name}/${item.key}?${project_id}`
+                  : `/${item.article_category.name}/${item.key}`
               }
             />
           ))}
@@ -33,15 +36,9 @@ export default function LatestBlogs({ blogs, imagePath, project_id }) {
   );
 }
 
-function BlogCard({ title, image, description, project_id }) {
+function BlogCard({ title, image, description, href }) {
   return (
-    <Link
-      href={
-        project_id
-          ? `/blogs/${title?.toLowerCase().replaceAll(" ", "-")}?${project_id}`
-          : `/blogs/${title?.toLowerCase().replaceAll(" ", "-")}`
-      }
-    >
+    <Link href={href}>
       <div className="relative overflow-hidden w-full h-96 hover:opacity-80 transition-all">
         <Image
           src={image}

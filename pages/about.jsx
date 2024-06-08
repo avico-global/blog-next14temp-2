@@ -20,21 +20,31 @@ import {
 const myFont = Montserrat({ subsets: ["cyrillic"] });
 const font2 = Cormorant({ subsets: ["cyrillic"] });
 
-export default function About({ logo, about_me, imagePath, project_id }) {
+export default function About({
+  logo,
+  about_me,
+  imagePath,
+  project_id,
+  categories,
+  blog_list,
+}) {
   const markdownIt = new MarkdownIt();
-  const content = markdownIt?.render(about_me||"");
+  const content = markdownIt?.render(about_me.value || "");
 
-  console.log(about_me);
   return (
     <div className={myFont.className}>
       <Head>
         <title>Next 14 Template</title>
       </Head>
       <Navbar
+        blog_list={blog_list}
+        categories={categories}
         logo={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${logo.file_name}`}
         project_id={project_id}
       />
-      <AboutBanner />
+      <AboutBanner
+        image={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${about_me.file_name}`}
+      />
       <FullContainer>
         <Container className="py-16">
           <div className="grid grid-cols-about gap-16 w-full">
@@ -48,7 +58,7 @@ export default function About({ logo, about_me, imagePath, project_id }) {
                 LIFESTYLE BLOGGER
               </p>
               <div
-                className="markdown-content about_me"
+                className="markdown-content about_me prose"
                 dangerouslySetInnerHTML={{ __html: content }}
               />
             </div>
@@ -67,13 +77,21 @@ export async function getServerSideProps({ req, query }) {
   const project_id = getProjectId(query);
   const logo = await callBackendApi({ domain, query, type: "logo" });
   const about_me = await callBackendApi({ domain, query, type: "about_me" });
-  console.log("🚀 ~ getServerSideProps ~ about_me:", about_me);
+  const categories = await callBackendApi({
+    domain,
+    query,
+    type: "categories",
+  });
+  const blog_list = await callBackendApi({ domain, query, type: "blog_list" });
+
   return {
     props: {
       logo: logo.data[0] || null,
-      about_me: about_me.data[0]?.length ? about_me.data[0]?.value : null,
+      about_me: about_me.data[0] || null,
       imagePath,
+      blog_list: blog_list.data[0].value,
       project_id,
+      categories: categories?.data[0]?.value || null,
     },
   };
 }

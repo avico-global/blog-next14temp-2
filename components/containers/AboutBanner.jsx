@@ -7,11 +7,11 @@ import { Cormorant } from "next/font/google";
 
 const myFont = Cormorant({ subsets: ["cyrillic"] });
 
-export default function AboutBanner() {
+export default function AboutBanner({ image }) {
   return (
     <FullContainer className="h-80 overflow-hidden p-10 bg-black/20 text-white text-center">
       <Image
-        src="https://cheerup2.theme-sphere.com/bold/wp-content/uploads/sites/8/2016/05/DSC2670-768x513.jpg"
+        src={image}
         alt="Background Image"
         priority={true}
         fill={true}

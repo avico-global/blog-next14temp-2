@@ -17,13 +17,21 @@ import {
 
 const myFont = Montserrat({ subsets: ["cyrillic"] });
 
-export default function Blogs({ logo, blog_list, project_id, imagePath }) {
+export default function Blogs({
+  logo,
+  blog_list,
+  project_id,
+  imagePath,
+  categories,
+}) {
   return (
     <div className={myFont.className}>
       <Head>
         <title>Next 14 Template Blogs</title>
       </Head>
       <Navbar
+        categories={categories}
+        blog_list={blog_list}
         logo={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${logo.file_name}`}
         project_id={project_id}
       />
@@ -65,6 +73,11 @@ export async function getServerSideProps({ req, query }) {
   const project_id = getProjectId(query);
   const logo = await callBackendApi({ domain, query, type: "logo" });
   const blog_list = await callBackendApi({ domain, query, type: "blog_list" });
+  const categories = await callBackendApi({
+    domain,
+    query,
+    type: "categories",
+  });
 
   return {
     props: {
@@ -72,6 +85,7 @@ export async function getServerSideProps({ req, query }) {
       blog_list: blog_list.data[0].value,
       imagePath,
       project_id,
+      categories: categories?.data[0]?.value || null,
     },
   };
 }
