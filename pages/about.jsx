@@ -33,6 +33,7 @@ export default function About({
   categories,
   blog_list,
   domain,
+  meta,
 }) {
   const markdownIt = new MarkdownIt();
   const content = markdownIt?.render(about_me.value || "");
@@ -175,6 +176,7 @@ export async function getServerSideProps({ req, query }) {
     type: "categories",
   });
   const blog_list = await callBackendApi({ domain, query, type: "blog_list" });
+  const meta = await callBackendApi({ domain, query, type: "meta_home" });
 
   return {
     props: {
@@ -185,6 +187,7 @@ export async function getServerSideProps({ req, query }) {
       project_id,
       categories: categories?.data[0]?.value || null,
       domain,
+      meta: meta?.data[0]?.value || null,
     },
   };
 }
