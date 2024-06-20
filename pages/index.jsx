@@ -32,6 +32,9 @@ export default function Home({
   categories,
   domain,
   meta,
+  about_me,
+  copyright,
+  contact_details,
 }) {
   return (
     <div className={myFont.className}>
@@ -75,6 +78,7 @@ export default function Home({
         categories={categories}
         logo={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${logo.file_name}`}
         project_id={project_id}
+        contact_details={contact_details}
       />
       <Banner
         badge={banner.value.badge}
@@ -109,7 +113,12 @@ export default function Home({
                 />
               ))}
             </div>
-            <Rightbar />
+            <Rightbar
+              about_me={about_me}
+              imagePath={imagePath}
+              categories={categories}
+              contact_details={contact_details}
+            />
           </div>
         </Container>
       </FullContainer>
@@ -129,6 +138,9 @@ export default function Home({
         logo={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${logo?.file_name}`}
         project_id={project_id}
         imagePath={imagePath}
+        about_me={about_me}
+        copyright={copyright}
+        contact_details={contact_details}
       />
 
       <JsonLd
@@ -196,6 +208,13 @@ export async function getServerSideProps({ req, query }) {
     query,
     type: "categories",
   });
+  const contact_details = await callBackendApi({
+    domain,
+    query,
+    type: "contact_details",
+  });
+  const about_me = await callBackendApi({ domain, query, type: "about_me" });
+  const copyright = await callBackendApi({ domain, query, type: "copyright" });
 
   return {
     props: {
@@ -207,6 +226,9 @@ export async function getServerSideProps({ req, query }) {
       blog_list: blog_list.data[0].value,
       categories: categories?.data[0]?.value || null,
       meta: meta?.data[0]?.value || null,
+      copyright: copyright?.data[0]?.value || null,
+      about_me: about_me.data[0] || null,
+      contact_details: contact_details.data[0].value,
     },
   };
 }

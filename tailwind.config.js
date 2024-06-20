@@ -75,6 +75,7 @@ module.exports = {
         home: "1fr 0.3fr",
         contact: "1fr 0.5fr",
         about: "1fr 0.4fr",
+        widget: "0.5fr 1fr",
       },
     },
   },

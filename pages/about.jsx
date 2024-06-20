@@ -34,6 +34,8 @@ export default function About({
   blog_list,
   domain,
   meta,
+  contact_details,
+  copyright,
 }) {
   const markdownIt = new MarkdownIt();
   const content = markdownIt?.render(about_me.value || "");
@@ -80,6 +82,7 @@ export default function About({
         categories={categories}
         logo={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${logo.file_name}`}
         project_id={project_id}
+        contact_details={contact_details}
       />
       <AboutBanner
         image={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${about_me.file_name}`}
@@ -97,11 +100,11 @@ export default function About({
                 LIFESTYLE BLOGGER
               </p>
               <div
-                className="markdown-content about_me prose"
+                className="prose-xl"
                 dangerouslySetInnerHTML={{ __html: content }}
               />
             </div>
-            <Rightbar />
+            <Rightbar page="about" contact_details={contact_details} />
           </div>
         </Container>
       </FullContainer>
@@ -111,6 +114,9 @@ export default function About({
         logo={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${logo?.file_name}`}
         project_id={project_id}
         imagePath={imagePath}
+        contact_details={contact_details}
+        copyright={copyright}
+        about_me={about_me}
       />
 
       <JsonLd
@@ -177,6 +183,16 @@ export async function getServerSideProps({ req, query }) {
   });
   const blog_list = await callBackendApi({ domain, query, type: "blog_list" });
   const meta = await callBackendApi({ domain, query, type: "meta_home" });
+  const contact_details = await callBackendApi({
+    domain,
+    query,
+    type: "contact_details",
+  });
+  const copyright = await callBackendApi({
+    domain,
+    query,
+    type: "copyright",
+  });
 
   return {
     props: {
@@ -188,6 +204,8 @@ export async function getServerSideProps({ req, query }) {
       categories: categories?.data[0]?.value || null,
       domain,
       meta: meta?.data[0]?.value || null,
+      contact_details: contact_details.data[0].value,
+      copyright: copyright?.data[0]?.value || null,
     },
   };
 }

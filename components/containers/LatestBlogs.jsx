@@ -1,23 +1,30 @@
-import React from "react";
+import React, { useState } from "react";
 import FullContainer from "../common/FullContainer";
 import Container from "../common/Container";
 import Image from "next/image";
 import Link from "next/link";
+import { Button } from "../ui/button";
 
 export default function LatestBlogs({ blogs, imagePath, project_id }) {
+  const [visibleBlogs, setVisibleBlogs] = useState(4);
+
+  const handleSeeMore = () => {
+    setVisibleBlogs((prevVisibleBlogs) => prevVisibleBlogs + 6);
+  };
+
   return (
     <FullContainer className="py-16 text-center">
       <Container>
-        <h2 className="font-bold text-3xl bg-white px-6">Lastest Posts</h2>
+        <h2 className="font-bold text-3xl bg-white px-6">Latest Blogs</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-y-10 gap-x-8 w-full mt-11 mb-3">
-          {blogs?.map((item, index) => (
+          {blogs?.slice(0, visibleBlogs).map((item, index) => (
             <BlogCard
               key={index}
               title={item.title}
               author={item.author}
               date={item.published_at}
               tagline={item.tagline}
-              description={item.articleContent}
+              content={item.articleContent}
               image={
                 item.image
                   ? `${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${item.image}`
@@ -31,15 +38,20 @@ export default function LatestBlogs({ blogs, imagePath, project_id }) {
             />
           ))}
         </div>
+        {visibleBlogs < blogs.length && (
+          <Button onClick={handleSeeMore} className="mt-10">
+            See More Articles
+          </Button>
+        )}
       </Container>
     </FullContainer>
   );
 }
 
-function BlogCard({ title, image, description, href }) {
+function BlogCard({ title, image, tagline, href }) {
   return (
-    <Link href={href}>
-      <div className="relative overflow-hidden w-full h-96 hover:opacity-80 transition-all">
+    <Link href={href || ""}>
+      <div className="relative overflow-hidden w-full h-80 hover:opacity-80 transition-all">
         <Image
           src={image}
           alt="Background Image"
@@ -51,7 +63,7 @@ function BlogCard({ title, image, description, href }) {
         />
       </div>
       <h3 className="font-semibold text-lg mt-4 leading-5">{title}</h3>
-      <p className="text-gray-500 mt-3 text-sm">{description}</p>
+      <p className="text-gray-500 mt-2 text-sm">{tagline.slice(0, 200)}</p>
     </Link>
   );
 }

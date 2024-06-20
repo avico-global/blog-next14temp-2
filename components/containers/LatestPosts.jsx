@@ -7,7 +7,7 @@ export default function LatestPosts({ blog_list, imagePath }) {
     <div className="flex flex-col">
       <p className="font-bold">Latest Posts</p>
       {blog_list
-        ?.slice(-4)
+        ?.slice(-3)
         .reverse()
         .map((item, index) => (
           <Blog

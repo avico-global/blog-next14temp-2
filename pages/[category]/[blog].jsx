@@ -2,7 +2,6 @@ import React from "react";
 import FullContainer from "@/components/common/FullContainer";
 import Rightbar from "@/components/containers/Rightbar";
 import Container from "@/components/common/Container";
-import Banner from "@/components/containers/Banner";
 import Navbar from "@/components/containers/Navbar";
 import Footer from "@/components/containers/Footer";
 import { useRouter } from "next/router";
@@ -21,6 +20,9 @@ import JsonLd from "@/components/json/JsonLd";
 import GoogleTagManager from "@/lib/GoogleTagManager";
 import useBreadcrumbs from "@/utils/useBreadcrumbs";
 import Breadcrumbs from "@/components/common/Breadcrumbs";
+import SocialShare from "@/components/containers/SocialShare";
+import Image from "next/image";
+import { Badge } from "@/components/ui/badge";
 const myFont = Roboto({
   subsets: ["cyrillic"],
   weight: ["400", "700"],
@@ -34,12 +36,17 @@ export default function Blog({
   imagePath,
   categories,
   domain,
+  about_me,
+  contact_details,
+  copyright,
+  tag_list,
 }) {
   const router = useRouter();
   const { category } = router.query;
   const markdownIt = new MarkdownIt();
   const content = markdownIt.render(myblog?.value.articleContent);
   const breadcrumbs = useBreadcrumbs();
+  const lastFiveBlogs = blog_list.slice(-5);
 
   return (
     <div className={myFont.className}>
@@ -85,28 +92,61 @@ export default function Blog({
         categories={categories}
         logo={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${logo?.file_name}`}
         project_id={project_id}
+        contact_details={contact_details}
       />
-      <Banner
-        title={myblog?.value.title}
-        tagline={myblog?.value.tagline}
-        image={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${myblog?.file_name}`}
-        author={myblog?.value.author}
-        published_at={myblog?.value.published_at}
-      />
-      <Breadcrumbs breadcrumbs={breadcrumbs} className="py-5 justify-center" />
       <FullContainer>
-        <Container>
-          <div className="grid grid-cols-1 md:grid-cols-home gap-14 w-full">
-            <div>
-              <div
-                className="markdown-content"
-                dangerouslySetInnerHTML={{ __html: content }}
-              />
+        <Container className="h-[62vh] bg-gradient-to-t from-black/50 overflow-hidden relative p-8 text-white md:justify-end">
+          <Image
+            src={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${myblog?.file_name}`}
+            alt="Background Image"
+            priority={true}
+            fill={true}
+            loading="eager"
+            className="-z-10 w-full h-full object-cover absolute top-0"
+          />
+          <div className="flex flex-col w-full gap-7">
+            <Badge className="w-fit">{myblog?.value?.article_category?.name}</Badge>
+            <h1 className="font-bold text-6xl capitalize max-w-screen-md">
+              {myblog?.value.title}
+            </h1>
+            <p>{myblog?.value.tagline}</p>
+            <div className="flex items-center gap-3">
+              <p>{myblog?.value.author}</p> -<p>{myblog?.value.published_at}</p>
             </div>
-            <Rightbar />
           </div>
         </Container>
       </FullContainer>
+
+      <FullContainer>
+        <Container>
+          <Breadcrumbs breadcrumbs={breadcrumbs} className="pt-7 pb-5" />
+          <div className="grid grid-cols-1 md:grid-cols-home gap-14 w-full">
+            <div>
+              <article className="prose lg:prose-xl max-w-full">
+                <div dangerouslySetInnerHTML={{ __html: content }} />
+              </article>
+              <div className="mt-12">
+                <h3 className="text-lg font-semibold">Share this article:</h3>
+                <SocialShare
+                  url={`http://${domain}${myblog?.article_category?.name}/${myblog?.key}`}
+                  title={myblog?.value.title}
+                />
+              </div>
+            </div>
+            <Rightbar
+              lastFiveBlogs={lastFiveBlogs}
+              imagePath={imagePath}
+              project_id={project_id}
+              tag_list={tag_list}
+              about_me={about_me}
+              categories={categories}
+              category={category}
+              contact_details={contact_details}
+            />
+          </div>
+        </Container>
+      </FullContainer>
+
       <LatestBlogs
         blogs={blog_list}
         imagePath={imagePath}
@@ -118,6 +158,9 @@ export default function Blog({
         logo={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${logo?.file_name}`}
         project_id={project_id}
         imagePath={imagePath}
+        about_me={about_me}
+        contact_details={contact_details}
+        copyright={copyright}
       />
 
       <JsonLd
@@ -129,9 +172,7 @@ export default function Blog({
               mainEntityOfPage: {
                 "@type": "WebPage",
                 "@id": myblog
-                  ? `http://${domain}/${myblog?.value.title
-                      ?.toLowerCase()
-                      .replaceAll(" ", "-")}`
+                  ? `http://${domain}${myblog?.article_category?.name}/${myblog?.key}`
                   : "",
               },
               headline: myblog?.value.title,
@@ -152,14 +193,14 @@ export default function Blog({
             },
             {
               "@type": "ItemList",
-              url: `http://${domain}/${myblog.key}`,
+              url: `http://${domain}${myblog?.article_category?.name}/${myblog?.key}`,
               name: "blog",
               itemListElement: blog_list?.map((blog, index) => ({
                 "@type": "ListItem",
                 position: index + 1,
                 item: {
                   "@type": "Article",
-                  url: `http://${domain}/${blog.key}`,
+                  url: `http://${domain}${blog?.article_category?.name}/${blog?.key}`,
                   name: blog.title,
                 },
               })),
@@ -167,7 +208,7 @@ export default function Blog({
             {
               "@type": "WebPage",
               "@id": `http://${domain}/${myblog?.key}`,
-              url: `http://${domain}/${myblog?.article}/${myblog?.key}`,
+              url: `http://${domain}/${myblog?.article_category?.name}/${myblog?.key}`,
               name: myblog?.value?.meta_title,
               description: myblog?.value?.meta_description,
               publisher: {
@@ -214,17 +255,30 @@ export async function getServerSideProps({ params, req, query }) {
       notFound: true,
     };
   }
+
+  const tag_list = await callBackendApi({ domain, query, type: "tag_list" });
   const logo = await callBackendApi({ domain, query, type: "logo" });
+  const about_me = await callBackendApi({ domain, query, type: "about_me" });
+  const contact_details = await callBackendApi({
+    domain,
+    query,
+    type: "contact_details",
+  });
+  const copyright = await callBackendApi({ domain, query, type: "copyright" });
 
   return {
     props: {
       domain,
       imagePath,
       project_id,
-      logo: logo.data[0],
-      myblog: blog.data[0],
-      blog_list: blog_list.data[0].value,
+      logo: logo?.data[0] || null,
+      myblog: blog?.data[0] || null,
+      blog_list: blog_list.data[0]?.value || null,
+      tag_list: tag_list?.data[0]?.value || null,
       categories: categories?.data[0]?.value || null,
+      about_me: about_me.data[0] || null,
+      contact_details: contact_details.data[0].value,
+      copyright: copyright.data[0].value || null,
     },
   };
 }

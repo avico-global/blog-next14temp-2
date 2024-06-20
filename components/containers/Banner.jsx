@@ -5,8 +5,7 @@ import Image from "next/image";
 import { Badge } from "../ui/badge";
 import { cn } from "@/lib/utils";
 import { Cormorant } from "next/font/google";
-
-const myFont = Cormorant({ subsets: ["cyrillic"] });
+import { Button } from "../ui/button";
 
 export default function Banner({
   title,
@@ -17,32 +16,33 @@ export default function Banner({
   published_at,
 }) {
   return (
-    <FullContainer className="h-[60vh] overflow-hidden p-10 bg-black/20 text-white text-center">
-      <Image
+    <FullContainer
+      style={{
+        backgroundImage: `url(${image})`,
+      }}
+      className="overflow-hidden bg-fixed text-white"
+    >
+      {/* <Image
         src={image}
         alt="Background Image"
         priority={true}
         fill={true}
         loading="eager"
         className="-z-10 w-full h-full object-cover absolute top-0"
-      />
-      <Container className="gap-6">
-        {badge && <Badge>{badge}</Badge>}
-        <h1
-          className={cn(
-            "font-extrabold text-7xl capitalize max-w-screen-md",
-            myFont.className
-          )}
-        >
-          {title}
-        </h1>
-        {tagline && <p className="text-xl">{tagline}</p>}
-        {author && (
-          <div className="flex items-center justify-center gap-4">
-            <p>{author}</p> -<p>{published_at}</p>
-          </div>
-        )}
-      </Container>
+      /> */}
+
+      <FullContainer className="gap-6 h-[60vh] bg-black/50 p-10 text-center">
+        <Container>
+          {badge && <Badge>{badge}</Badge>}
+          <h1 className="font-extrabold text-5xl md:text-7xl capitalize leading-10">
+            {title}
+          </h1>
+          {tagline && <p className="mt-10 text-lg">{tagline}</p>}
+          <Button className="bg-white hover:text-white text-black mt-10">
+            Explore Rovella
+          </Button>
+        </Container>
+      </FullContainer>
     </FullContainer>
   );
 }
