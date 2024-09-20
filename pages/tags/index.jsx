@@ -1,62 +1,65 @@
 import React from "react";
 import Head from "next/head";
 import Footer from "@/components/containers/Footer";
-import {
-  callBackendApi,
-  getDomain,
-  getImagePath,
-  getProjectId,
-} from "@/lib/myFun";
+import { callBackendApi, getDomain, getImagePath } from "@/lib/myFun";
 import GoogleTagManager from "@/lib/GoogleTagManager";
 import JsonLd from "@/components/json/JsonLd";
-import Image from "next/image";
 import FullContainer from "@/components/common/FullContainer";
 import Container from "@/components/common/Container";
 import { useRouter } from "next/router";
-import dayjs from "dayjs";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import Breadcrumbs from "@/components/common/Breadcrumbs";
-import useBreadcrumbs from "@/utils/useBreadcrumbs";
 import Navbar from "@/components/containers/Navbar";
-import MarkdownIt from "markdown-it";
+import useBreadcrumbs from "@/lib/useBreadcrumbs";
 
-import { Roboto } from "next/font/google";
-const myFont = Roboto({
-  subsets: ["cyrillic"],
-  weight: ["400", "700"],
+// Font
+import { Raleway } from "next/font/google";
+import Rightbar from "@/components/containers/Rightbar";
+const myFont = Raleway({
+  subsets: ["cyrillic", "cyrillic-ext", "latin", "latin-ext"],
 });
 
-export default function Categories({
+export default function Tags({
   logo,
   blog_list,
   imagePath,
   meta,
   domain,
   categories,
-  project_id,
   about_me,
   contact_details,
+  favicon,
   layout,
-  copyright,
+  tag_list,
+  nav_type,
 }) {
   const router = useRouter();
   const { category } = router.query;
+
   const breadcrumbs = useBreadcrumbs();
-  const markdownIt = new MarkdownIt();
 
-  const convertMarkdown = (markdownText) => markdownIt?.render(markdownText);
+  const renderTags = () => (
+    <div className="flex items-center flex-wrap w-full text-left gap-2">
+      {tag_list.map((item, index) => (
+        <Link
+          key={index}
+          title={item.tag}
+          href={`/tags/${item.tag?.replaceAll(" ", "-").toLowerCase()}`}
+          className="bg-gray-200 hover:bg-gray-400 transition-all cursor-pointer rounded py-2 px-4 flex items-center gap-2"
+        >
+          {item.tag}
+          {item.article_ids?.length > 1 && (
+            <span className="bg-black text-white px-2 py-[1px] flex items-center justify-center w-fit h-fit text-sm rounded-full">
+              {item.article_ids.length}
+            </span>
+          )}
+        </Link>
+      ))}
+    </div>
+  );
 
-  const filteredBlogList = blog_list.filter((item) => {
-    const searchContent = category?.replace("-", " ");
-    return (
-      item.title.toLowerCase().includes(searchContent) ||
-      item.article_category.name.toLowerCase().includes(searchContent) ||
-      item.tags?.some((tag) => tag.toLowerCase().includes(searchContent)) ||
-      item.articleContent.toLowerCase().includes(searchContent)
-    );
-  });
-  const page = layout?.find((page) => page.page === "category");
+  const page = layout?.find((page) => page.page === "tags");
 
   return (
     <div
@@ -67,12 +70,23 @@ export default function Categories({
     >
       <Head>
         <meta charSet="UTF-8" />
-        <title>{meta?.title}</title>
-        <meta name="description" content={meta?.description} />
-        <link rel="author" href={`http://${domain}`} />
-        <link rel="publisher" href={`http://${domain}`} />
-        <link rel="canonical" href={`http://${domain}`} />
-        <meta name="robots" content="noindex" />
+        <title>
+          {meta?.title?.replaceAll(
+            "##category##",
+            category?.replaceAll("-", " ")
+          )}
+        </title>
+        <meta
+          name="description"
+          content={meta?.description.replaceAll(
+            "##category##",
+            category?.replaceAll("-", " ")
+          )}
+        />
+        <link rel="author" href={`https://www.${domain}`} />
+        <link rel="publisher" href={`https://www.${domain}`} />
+        <link rel="canonical" href={`https://www.${domain}/tags`} />
+        {/* <meta name="robots" content="noindex" /> */}
         <meta name="theme-color" content="#008DE5" />
         <link rel="manifest" href="/manifest.json" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
@@ -85,19 +99,19 @@ export default function Categories({
         <link
           rel="apple-touch-icon"
           sizes="180x180"
-          href={`https://api15.ecommcube.com/${domain}/apple-touch-icon.png`}
+          href={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${favicon}`}
         />
         <link
           rel="icon"
           type="image/png"
           sizes="32x32"
-          href={`https://api15.ecommcube.com/${domain}/favicon-32x32.png`}
+          href={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${favicon}`}
         />
         <link
           rel="icon"
           type="image/png"
           sizes="16x16"
-          href={`https://api15.ecommcube.com/${domain}/favicon-16x16.png`}
+          href={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${favicon}`}
         />
       </Head>
 
@@ -108,85 +122,40 @@ export default function Categories({
               case "navbar":
                 return (
                   <Navbar
+                    key={index}
+                    logo={`${imagePath}/${logo.file_name}`}
+
+                    nav_type={nav_type}
                     category={category}
-                    project_id={project_id}
+                    imagePath={imagePath}
                     blog_list={blog_list}
                     categories={categories}
-                    logo={`${imagePath}/${logo.file_name}`}
                     contact_details={contact_details}
                   />
                 );
               case "breadcrumbs":
                 return (
-                  <FullContainer className="w-full py-8 bg-gray-100">
-                    <p className="text-2xl font-semibold capitalize px-4 py-1">
-                      {category?.replace("-", " ")}
-                    </p>
-                    <div className="w-24 mt-2 h-1 bg-gray-500"></div>
-                    <Breadcrumbs
-                      breadcrumbs={breadcrumbs}
-                      className="mt-1 justify-center"
-                    />
+                  <FullContainer key={index}>
+                    <Container>
+                      <Breadcrumbs breadcrumbs={breadcrumbs} className="py-8" />
+                    </Container>
                   </FullContainer>
                 );
-              case "search result":
+              case "tags":
                 return (
-                  <FullContainer className="py-16">
+                  <FullContainer key={index} className="mb-12">
                     <Container>
-                      <div className="w-full grid grid-cols-1 md:grid-cols-2 gap-10">
-                        {filteredBlogList.map((item, index) => (
-                          <div key={index}>
-                            <Link
-                              title={item?.title || "Article Link"}
-                              href={`/${category
-                                ?.replaceAll(" ", "-")
-                                ?.toLowerCase()}/${item?.title
-                                ?.replaceAll(" ", "-")
-                                ?.toLowerCase()}`}
-                            >
-                              <div className="overflow-hidden relative min-h-40 rounded lg:min-h-72 w-full bg-black flex-1">
-                                <Image
-                                  title={item.imageTitle || "Article" }
-                                  src={
-                                    item.image
-                                      ? `${imagePath}/${item.image}`
-                                      : "/no-image.png"
-                                  }
-                                  fill={true}
-                                  loading="lazy"
-                                  alt="blog"
-                                  className="w-full h-full object-cover absolute top-0 scale-125"
-                                />
-                              </div>
-                            </Link>
-                            <p className="mt-2 lg:mt-3 font-bold text-lg text-inherit leading-tight">
-                              {item.title}
-                            </p>
-                            <div className="flex items-center gap-2 mt-1">
-                              <p className="text-sm font-semibold">
-                                <span className="text-gray-400 text-sm">
-                                  By
-                                </span>
-                                : {item.author}
-                              </p>
-                              <span className="text-gray-400">--</span>
-                              <p className="text-sm text-gray-400 font-semibold">
-                                {dayjs(item?.published_at)?.format(
-                                  "MMM D, YYYY"
-                                )}
-                              </p>
-                            </div>
-                            <div
-                              className="mt-1 markdown-content"
-                              style={{ fontSize: 12 }}
-                              dangerouslySetInnerHTML={{
-                                __html: convertMarkdown(
-                                  item?.articleContent
-                                ).slice(0, 200),
-                              }}
-                            />
-                          </div>
-                        ))}
+                      <div className="grid grid-cols-1 md:grid-cols-home gap-12 w-full">
+                        <div> {renderTags()}</div>
+                        <Rightbar
+                          about_me={about_me}
+                          tag_list={tag_list}
+                          blog_list={blog_list}
+                          imagePath={imagePath}
+                          categories={categories}
+                          contact_details={contact_details}
+                          widgets={page?.widgets}
+                        />
                       </div>
                     </Container>
                   </FullContainer>
@@ -194,14 +163,11 @@ export default function Categories({
               case "footer":
                 return (
                   <Footer
+                    key={index}
+                    imagePath={imagePath}
                     blog_list={blog_list}
                     categories={categories}
-                    logo={`${imagePath}/${logo?.file_name}`}
-                    project_id={project_id}
-                    imagePath={imagePath}
-                    about_me={about_me}
-                    contact_details={contact_details}
-                    copyright={copyright}
+                    category={category}
                   />
                 );
               default:
@@ -250,6 +216,23 @@ export default function Categories({
               ],
             },
             {
+              "@type": "WebSite",
+              "@id": `http://${domain}/#website`,
+              url: `http://${domain}/`,
+              name: domain,
+              description: meta?.description,
+              inLanguage: "en-US",
+              // potentialAction: {
+              //   "@type": "SearchAction",
+              //   target: `http://${domain}/search?q={search_term_string}`,
+              //   "query-input": "required name=search_term_string",
+              // },
+              publisher: {
+                "@type": "Organization",
+                "@id": `http://${domain}`,
+              },
+            },
+            {
               "@type": "ItemList",
               url: `http://${domain}`,
               name: "blog",
@@ -258,7 +241,9 @@ export default function Categories({
                 position: index + 1,
                 item: {
                   "@type": "Article",
-                  url: `http://${domain}/${blog?.article_category?.name}/${blog.key}`,
+                  url: `http://${domain}/${
+                    blog?.article_category?.name
+                  }/${blog?.title?.replaceAll(" ", "-")?.toLowerCase()}`,
                   name: blog.title,
                 },
               })),
@@ -272,7 +257,6 @@ export default function Categories({
 
 export async function getServerSideProps({ req, query }) {
   const domain = getDomain(req?.headers?.host);
-  const { category } = query;
 
   const logo = await callBackendApi({
     domain,
@@ -302,7 +286,7 @@ export async function getServerSideProps({ req, query }) {
     query,
     type: "categories",
   });
-  const meta = await callBackendApi({ domain, query, type: "meta_category" });
+  const meta = await callBackendApi({ domain, query, type: "meta_tags" });
   const about_me = await callBackendApi({ domain, query, type: "about_me" });
   const layout = await callBackendApi({ domain, type: "layout" });
   const tag_list = await callBackendApi({ domain, type: "tag_list" });
@@ -310,16 +294,6 @@ export async function getServerSideProps({ req, query }) {
 
   let project_id = logo?.data[0]?.project_id || null;
   let imagePath = await getImagePath(project_id, domain);
-
-  const categoryExists = categories?.data[0]?.value?.some(
-    (cat) => cat?.toLowerCase() === category?.replaceAll("-", " ").toLowerCase()
-  );
-
-  if (!categoryExists) {
-    return {
-      notFound: true,
-    };
-  }
 
   return {
     props: {

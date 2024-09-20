@@ -23,16 +23,12 @@ export default function MostPopular({ blog_list, imagePath, project_id }) {
                   tagline={item.tagline}
                   description={item.articleContent}
                   image={
-                    item.image
-                      ? `${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${item.image}`
-                      : "/no-image.png"
+                    item.image ? `${imagePath}/${item.image}` : "/no-image.png"
                   }
-                  project_id={project_id}
-                  href={
-                    project_id
-                      ? `/${item?.article_category?.name}/${item.key}?${project_id}`
-                      : `/${item?.article_category?.name}/${item.key}`
-                  }
+                  // project_id={project_id}
+                  href={`/${item?.article_category?.name}/${item?.title
+                    ?.replaceAll(" ", "-")
+                    ?.toLowerCase()}`}
                   category={item.article_category.name}
                 />
               )
@@ -46,6 +42,7 @@ export default function MostPopular({ blog_list, imagePath, project_id }) {
 function BlogCard({
   title,
   image,
+  imageTitle,
   description,
   className,
   author,
@@ -55,8 +52,14 @@ function BlogCard({
 }) {
   return (
     <div className="flex flex-col items-center text-center">
-      <Link href={href || ""} className="relative overflow-hidden w-full h-52">
+      <Link
+        title={imageTitle || "Article Thumbnail"}
+        href={href || ""}
+        className="relative overflow-hidden w-full h-[195px]"
+      >
+        {" "}
         <Image
+        title={imageTitle || "Article Thumbnai" }
           src={image}
           alt="Background Image"
           priority={true}

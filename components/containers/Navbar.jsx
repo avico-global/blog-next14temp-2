@@ -52,7 +52,7 @@ export default function Navbar({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [openSearch, sidebar]);
+  },  [openSearch, sidebar]);
 
   const filteredBlogs = blog_list?.filter((item) =>
     item?.title?.toLowerCase()?.includes(searchQuery?.toLowerCase())
@@ -69,6 +69,7 @@ export default function Navbar({
       <div>
         <div className="hidden md:flex items-center sticky top-0 bg-white z-20 shadow-sm justify-center w-full border-b border-gray-100">
           <Link
+          title="Home"
             href={project_id ? `/?${project_id}` : "/"}
             className={cn(
               "uppercase text-sm p-3",
@@ -79,6 +80,7 @@ export default function Navbar({
           </Link>
           {categories?.map((item, index) => (
             <Link
+          title={item}
               key={index}
               href={project_id ? `/${item}?${project_id}` : `/${item}`}
               className={cn(
@@ -91,6 +93,7 @@ export default function Navbar({
             </Link>
           ))}
           <Link
+          title="About"
             href={project_id ? `/${"about"}?${project_id}` : `/${"about"}`}
             className={cn(
               "uppercase text-sm p-3",
@@ -100,6 +103,7 @@ export default function Navbar({
             About
           </Link>
           <Link
+          title="Contact"
             href={project_id ? `/${"contact"}?${project_id}` : `/${"contact"}`}
             className={cn(
               "uppercase text-sm p-3",
@@ -128,6 +132,7 @@ export default function Navbar({
                 <div className="absolute top-full p-3 left-0 bg-white shadow-2xl rounded-md mt-1 z-10 w-[calc(100vw-40px)] lg:w-[650px]">
                   {filteredBlogs?.map((item, index) => (
                     <Link
+                    title={item.title || "SearchQuery"}
                       key={index}
                       href={
                         project_id
@@ -144,8 +149,9 @@ export default function Navbar({
               )}
             </div>
             <div className="flex items-center lg:justify-center">
-              <Link href={project_id ? `/?${project_id}` : "/"}>
+              <Link  title={logo} href={project_id ? `/?${project_id}` : "/"}>
                 <Image
+                  title="Logo"
                   height={50}
                   width={170}
                   src={logo}
@@ -160,7 +166,9 @@ export default function Navbar({
             >
               <div className="hidden md:flex items-center gap-3">
                 {contact_details?.socials?.map((item, index) => (
-                  <Link key={index} href={item.link} aria-label={item.name}>
+                  <Link
+                  title="Icon"
+                  key={index} href={item.link} aria-label={item.name}>
                     {socialIcons[item.name]}
                   </Link>
                 ))}
@@ -179,6 +187,7 @@ export default function Navbar({
                     <div className="absolute top-full p-3 right-0 bg-white shadow-2xl rounded-md mt-1 z-10 w-[calc(100vw-40px)] lg:w-[650px]">
                       {filteredBlogs?.map((item, index) => (
                         <Link
+                        title={item.title}
                           key={index}
                           href={
                             project_id
@@ -229,6 +238,7 @@ export default function Navbar({
         </div>
         <div className="flex flex-col mt-5">
           <Link
+          title="Home"
             href={project_id ? `/?${project_id}` : "/"}
             className={cn(
               "font-semibold text-gray-500 capitalize border-b hover:text-black hover:border-black transition-all px-2 py-3",
@@ -239,6 +249,7 @@ export default function Navbar({
           </Link>
           {categories?.map((item, index) => (
             <Link
+            title={item}
               key={index}
               href={project_id ? `/${item}?${project_id}` : `/${item}`}
               className={cn(
@@ -251,6 +262,7 @@ export default function Navbar({
             </Link>
           ))}
           <Link
+          title="About"
             href={project_id ? `/${"about"}?${project_id}` : `/${"about"}`}
             className={cn(
               "font-semibold text-gray-500 capitalize border-b hover:text-black hover:border-black transition-all px-2 py-3",
@@ -260,6 +272,7 @@ export default function Navbar({
             About
           </Link>
           <Link
+          title="Contact"
             href={project_id ? `/${"contact"}?${project_id}` : `/${"contact"}`}
             className={cn(
               "font-semibold text-gray-500 capitalize border-b hover:text-black hover:border-black transition-all px-2 py-3",

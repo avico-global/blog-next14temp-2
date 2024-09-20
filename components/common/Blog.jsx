@@ -16,9 +16,12 @@ export default function Blog({
   return (
     <div className={className}>
       <BlogHead title={title} date={date} author={author} />
-      <Link href={href}>
+      <Link
+    title={title || "Artice"}
+      href={href}>
         <div className="relative overflow-hidden w-full h-[60vh] mt-8">
           <Image
+           title={ title || "Article Thumbnail"}
             src={image}
             fill={true}
             quality={80}
@@ -31,7 +34,9 @@ export default function Blog({
         </div>
       </Link>
       <p className="mt-3">{description}</p>
-      <Link href={href}>
+      <Link
+      title="Read More"
+      href={href}>
         <Button className="mt-6">Read More</Button>
       </Link>
     </div>

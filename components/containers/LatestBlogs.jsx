@@ -26,9 +26,7 @@ export default function LatestBlogs({ blogs, imagePath, project_id }) {
               tagline={item.tagline}
               content={item.articleContent}
               image={
-                item.image
-                  ? `${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${item.image}`
-                  : "/no-image.png"
+                item.image ? `${imagePath}/${item.image}` : "/no-image.png"
               }
               href={
                 project_id
@@ -50,9 +48,10 @@ export default function LatestBlogs({ blogs, imagePath, project_id }) {
 
 function BlogCard({ title, image, tagline, href }) {
   return (
-    <Link href={href || ""}>
+    <Link title={title || "Article"}  href={href || ""}>
       <div className="relative overflow-hidden w-full h-80 hover:opacity-80 transition-all">
         <Image
+        title={title || "Article Thumbnail"}
           src={image}
           alt="Background Image"
           priority={true}

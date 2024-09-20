@@ -13,12 +13,12 @@ export default function LatestPosts({ blog_list, imagePath }) {
           <Blog
             key={index}
             title={item.title}
-            href={`/${item?.article_category?.name}/${item.key}`}
-            image={
-              item.image
-                ? `${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${item.image}`
-                : "/no-image.png"
-            }
+            href={`/${item?.article_category?.name
+              ?.toLowerCase()
+              ?.replaceAll(" ", "-")}/${item?.title
+              ?.replaceAll(" ", "-")
+              ?.toLowerCase()}`}
+            image={item.image ? `${imagePath}/${item.image}` : "/no-image.png"}
             author={item.author}
             date={item.published_at}
           />
@@ -30,8 +30,13 @@ export default function LatestPosts({ blog_list, imagePath }) {
 function Blog({ image, title, href, author, date }) {
   return (
     <div className="flex items-center gap-3 mt-5 cursor-pointer">
-      <Link href={href || ""} className="relative overflow-hidden w-2/6 h-20">
+      <Link
+        title={title || "Article Thumbnail"}
+        href={href || ""}
+        className="relative overflow-hidden w-2/6 h-20"
+      >
         <Image
+        title={title || "Thumbnail"}
           src={image}
           fill={true}
           loading="eager"

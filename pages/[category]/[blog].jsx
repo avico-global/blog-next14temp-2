@@ -8,12 +8,7 @@ import { useRouter } from "next/router";
 import MarkdownIt from "markdown-it";
 import LatestBlogs from "@/components/containers/LatestBlogs";
 import Head from "next/head";
-import {
-  callBackendApi,
-  getDomain,
-  getImagePath,
-  getProjectId,
-} from "@/lib/myFun";
+import { callBackendApi, getDomain, getImagePath } from "@/lib/myFun";
 
 import { Roboto } from "next/font/google";
 import JsonLd from "@/components/json/JsonLd";
@@ -23,6 +18,7 @@ import Breadcrumbs from "@/components/common/Breadcrumbs";
 import SocialShare from "@/components/containers/SocialShare";
 import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
+import { title } from "process";
 const myFont = Roboto({
   subsets: ["cyrillic"],
   weight: ["400", "700"],
@@ -32,6 +28,7 @@ export default function Blog({
   logo,
   myblog,
   blog_list,
+  layout,
   project_id,
   imagePath,
   categories,
@@ -44,9 +41,9 @@ export default function Blog({
   const router = useRouter();
   const { category } = router.query;
   const markdownIt = new MarkdownIt();
-  const content = markdownIt.render(myblog?.value.articleContent);
+  const content = markdownIt.render(myblog?.value?.articleContent || "");
   const breadcrumbs = useBreadcrumbs();
-  const lastFiveBlogs = blog_list.slice(-5);
+  const page = layout?.find((page) => page.page?.toLowerCase() === "blog page");
 
   return (
     <div className={myFont.className}>
@@ -86,82 +83,124 @@ export default function Blog({
         />
       </Head>
 
-      <Navbar
-        blog_list={blog_list}
-        category={category}
-        categories={categories}
-        logo={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${logo?.file_name}`}
-        project_id={project_id}
-        contact_details={contact_details}
-      />
-      <FullContainer>
-        <Container className="h-[62vh] bg-gradient-to-t from-black/50 overflow-hidden relative p-8 text-white md:justify-end">
-          <Image
-            src={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${myblog?.file_name}`}
-            alt="Background Image"
-            priority={true}
-            fill={true}
-            loading="eager"
-            className="-z-10 w-full h-full object-cover absolute top-0"
-          />
-          <div className="flex flex-col w-full gap-7">
-            <Badge className="w-fit">{myblog?.value?.article_category?.name}</Badge>
-            <h1 className="font-bold text-6xl capitalize max-w-screen-md">
-              {myblog?.value.title}
-            </h1>
-            <p>{myblog?.value.tagline}</p>
-            <div className="flex items-center gap-3">
-              <p>{myblog?.value.author}</p> -<p>{myblog?.value.published_at}</p>
-            </div>
-          </div>
-        </Container>
-      </FullContainer>
-
-      <FullContainer>
-        <Container>
-          <Breadcrumbs breadcrumbs={breadcrumbs} className="pt-7 pb-5" />
-          <div className="grid grid-cols-1 md:grid-cols-home gap-14 w-full">
-            <div>
-              <article className="prose lg:prose-xl max-w-full">
-                <div dangerouslySetInnerHTML={{ __html: content }} />
-              </article>
-              <div className="mt-12">
-                <h3 className="text-lg font-semibold">Share this article:</h3>
-                <SocialShare
-                  url={`http://${domain}${myblog?.article_category?.name}/${myblog?.key}`}
-                  title={myblog?.value.title}
-                />
-              </div>
-            </div>
-            <Rightbar
-              lastFiveBlogs={lastFiveBlogs}
-              imagePath={imagePath}
-              project_id={project_id}
-              tag_list={tag_list}
-              about_me={about_me}
-              categories={categories}
-              category={category}
-              contact_details={contact_details}
-            />
-          </div>
-        </Container>
-      </FullContainer>
-
-      <LatestBlogs
-        blogs={blog_list}
-        imagePath={imagePath}
-        project_id={project_id}
-      />
-      <Footer
-        blog_list={blog_list}
-        categories={categories}
-        logo={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${logo?.file_name}`}
-        project_id={project_id}
-        imagePath={imagePath}
-        about_me={about_me}
-        contact_details={contact_details}
-        copyright={copyright}
-      />
+      <div className="flex flex-col gap-19">
+        {page?.enable
+          ? page?.sections?.map((item, index) => {
+              if (!item.enable) return null;
+              switch (item.section?.toLowerCase()) {
+                case "navbar":
+                  return (
+                    <Navbar
+                      blog_list={blog_list}
+                      category={category}
+                      categories={categories}
+                      logo={`${imagePath}/${logo?.file_name}`}
+                      project_id={project_id}
+                      contact_details={contact_details}
+                    />
+                  );
+                case "banner":
+                  return (
+                    <FullContainer>
+                      <Container className="h-[calc(100vh-200px)] xl:max-h-[50vh] 2xl:max-h-[40vh] bg-gradient-to-t from-black/50 overflow-hidden relative p-8 text-white md:justify-end">
+                        <Image
+                        title={title}
+                          src={`${imagePath}/${myblog?.file_name}`}
+                          alt="Background Image"
+                          priority={true}
+                          fill={true}
+                          loading="eager"
+                          className="-z-10 w-full h-full object-cover absolute top-0"
+                        />
+                        <div className="flex flex-col w-full gap-7">
+                          <Badge className="w-fit">
+                            {myblog?.value?.article_category?.name}
+                          </Badge>
+                          <h1 className="font-bold text-6xl capitalize max-w-screen-md">
+                            {myblog?.value.title}
+                          </h1>
+                          <p>{myblog?.value.tagline}</p>
+                          <div className="flex items-center gap-3">
+                            <p>{myblog?.value.author}</p> -
+                            <p>{myblog?.value.published_at}</p>
+                          </div>
+                        </div>
+                      </Container>
+                    </FullContainer>
+                  );
+                case "breadcrumbs":
+                  return (
+                    <FullContainer key={index}>
+                      <Container>
+                        <Breadcrumbs
+                          breadcrumbs={breadcrumbs}
+                          className="py-7"
+                        />
+                      </Container>
+                    </FullContainer>
+                  );
+                case "blog text":
+                  return (
+                    <FullContainer>
+                      <Container>
+                        <div className="grid grid-cols-1 md:grid-cols-home gap-14 w-full">
+                          <div>
+                            <article className="prose lg:prose-xl max-w-full">
+                              <div
+                                dangerouslySetInnerHTML={{ __html: content }}
+                              />
+                            </article>
+                            <div className="mt-12">
+                              <h2 className="text-lg font-semibold">
+                                Share this article:
+                              </h2>
+                              <SocialShare
+                                url={`http://${domain}${myblog?.article_category?.name}/${myblog?.key}`}
+                                title={myblog?.value.title}
+                              />
+                            </div>
+                          </div>
+                          <Rightbar
+                            imagePath={imagePath}
+                            tag_list={tag_list}
+                            about_me={about_me}
+                            categories={categories}
+                            category={category}
+                            contact_details={contact_details}
+                            blog_list={blog_list}
+                            widgets={page?.widgets}
+                          />
+                        </div>
+                      </Container>
+                    </FullContainer>
+                  );
+                case "latest posts":
+                  return (
+                    <LatestBlogs
+                      blogs={blog_list}
+                      imagePath={imagePath}
+                      project_id={project_id}
+                    />
+                  );
+                case "footer":
+                  return (
+                    <Footer
+                      blog_list={blog_list}
+                      categories={categories}
+                      logo={`${imagePath}/${logo?.file_name}`}
+                      project_id={project_id}
+                      imagePath={imagePath}
+                      about_me={about_me}
+                      contact_details={contact_details}
+                      copyright={copyright}
+                    />
+                  );
+                default:
+                  return null;
+              }
+            })
+          : "Page Disabled, under maintenance"}
+      </div>
 
       <JsonLd
         data={{
@@ -230,55 +269,60 @@ export default function Blog({
   );
 }
 
-export async function getServerSideProps({ params, req, query }) {
+export async function getServerSideProps({ req, query }) {
   const domain = getDomain(req?.headers?.host);
-  const imagePath = await getImagePath({ domain, query });
-  const project_id = getProjectId(query);
-  const blog = await callBackendApi({
-    domain,
-    query,
-    type: params.blog,
-  });
-  const categories = await callBackendApi({
-    domain,
-    query,
-    type: "categories",
-  });
-  const blog_list = await callBackendApi({ domain, query, type: "blog_list" });
+  const { category, blog } = query;
 
-  const isValidBlog = blog_list.data[0].value.some(
-    (item) => item.key === params.blog
+  const categories = await callBackendApi({ domain, type: "categories" });
+  const blog_list = await callBackendApi({ domain, type: "blog_list" });
+
+  const isValidBlog = blog_list?.data[0]?.value?.find(
+    (item) =>
+      item.title?.replaceAll(" ", "-")?.toLowerCase() ===
+      blog?.replaceAll(" ", "-")
   );
 
-  if (!isValidBlog) {
+  const categoryExists = categories?.data[0]?.value?.some(
+    (cat) => cat?.toLowerCase() === category?.replaceAll("-", " ").toLowerCase()
+  );
+
+  if (!categoryExists || !isValidBlog) {
     return {
       notFound: true,
     };
   }
 
-  const tag_list = await callBackendApi({ domain, query, type: "tag_list" });
-  const logo = await callBackendApi({ domain, query, type: "logo" });
-  const about_me = await callBackendApi({ domain, query, type: "about_me" });
+  const myblog = await callBackendApi({ domain, type: isValidBlog?.key });
+  const tag_list = await callBackendApi({ domain, type: "tag_list" });
+  const logo = await callBackendApi({ domain, type: "logo" });
+  const favicon = await callBackendApi({ domain, type: "favicon" });
+  const about_me = await callBackendApi({ domain, type: "about_me" });
   const contact_details = await callBackendApi({
     domain,
-    query,
     type: "contact_details",
   });
-  const copyright = await callBackendApi({ domain, query, type: "copyright" });
+  const copyright = await callBackendApi({ domain, type: "copyright" });
+  const layout = await callBackendApi({ domain, type: "layout" });
+  const nav_type = await callBackendApi({ domain, type: "nav_type" });
+
+  let project_id = logo?.data[0]?.project_id || null;
+  let imagePath = await getImagePath(project_id, domain);
 
   return {
     props: {
       domain,
       imagePath,
-      project_id,
       logo: logo?.data[0] || null,
-      myblog: blog?.data[0] || null,
+      myblog: myblog?.data[0] || {},
+      layout: layout?.data[0]?.value || null,
       blog_list: blog_list.data[0]?.value || null,
       tag_list: tag_list?.data[0]?.value || null,
       categories: categories?.data[0]?.value || null,
       about_me: about_me.data[0] || null,
       contact_details: contact_details.data[0].value,
       copyright: copyright.data[0].value || null,
+      favicon: favicon?.data[0]?.file_name || null,
+      nav_type: nav_type?.data[0]?.value || {},
     },
   };
 }

@@ -1,59 +1,69 @@
+import React, { useEffect } from "react";
+
+// Components
 import Container from "@/components/common/Container";
 import FullContainer from "@/components/common/FullContainer";
-import AboutBanner from "@/components/containers/AboutBanner";
-import Footer from "@/components/containers/Footer";
 import Navbar from "@/components/containers/Navbar";
-import React from "react";
-import { Cormorant } from "next/font/google";
-import { cn } from "@/lib/utils";
-import Rightbar from "@/components/containers/Rightbar";
-import Head from "next/head";
-import MarkdownIt from "markdown-it";
-import {
-  callBackendApi,
-  getDomain,
-  getImagePath,
-  getProjectId,
-} from "@/lib/myFun";
-
-import { Roboto } from "next/font/google";
+import Footer from "@/components/containers/Footer";
 import GoogleTagManager from "@/lib/GoogleTagManager";
-import JsonLd from "@/components/json/JsonLd";
-import { title } from "process";
-const myFont = Roboto({
-  subsets: ["cyrillic"],
-  weight: ["400", "700"],
-});
-const font2 = Cormorant({ subsets: ["cyrillic"] });
+import MarkdownIt from "markdown-it";
+import useBreadcrumbs from "@/lib/useBreadcrumbs";
+import Breadcrumbs from "@/components/common/Breadcrumbs";
+import { callBackendApi, getDomain, getImagePath } from "@/lib/myFun";
 
-export default function About({
-  logo,
-  about_me,
-  imagePath,
-  project_id,
-  categories,
-  blog_list,
+import Head from "next/head";
+import { Raleway } from "next/font/google";
+import JsonLd from "@/components/json/JsonLd";
+import { useRouter } from "next/router";
+const myFont = Raleway({
+  subsets: ["cyrillic", "cyrillic-ext", "latin", "latin-ext"],
+});
+
+export default function Terms({
   domain,
-  layout,
+  imagePath,
+  logo,
+  favicon,
+  blog_list,
+  about_me,
+  categories,
   meta,
+  project_id,
   contact_details,
+  terms,
   copyright,
+  layout,
+  nav_type,
 }) {
   const markdownIt = new MarkdownIt();
-  const content = markdownIt?.render(about_me.value || "");
+  const content = markdownIt?.render(terms || "");
+  const breadcrumbs = useBreadcrumbs();
+  const router = useRouter();
+  const currentPath = router.pathname;
 
-  const page = layout?.find((page) => page.page === "about");
+  useEffect(() => {
+    if (currentPath.includes("%20") || currentPath.includes(" ")) {
+      router.replace("/privacy-policy");
+    }
+  }, [currentPath, router]);
+
+  const page = layout?.find((page) => page.page === "terms");
 
   return (
-    <div className={myFont.className}>
+    <div
+      className={`min-h-screen flex flex-col justify-between ${myFont.className}`}
+    >
       <Head>
         <meta charSet="UTF-8" />
         <title>{meta?.title}</title>
         <meta name="description" content={meta?.description} />
-        <link rel="author" href={`http://${domain}`} />
-        <link rel="publisher" href={`http://${domain}`} />
-        <link rel="canonical" href={`http://${domain}`} />
-        <meta name="robots" content="noindex" />
+        <link rel="author" href={`https://www.${domain}`} />
+        <link rel="publisher" href={`https://www.${domain}`} />
+        <link
+          rel="canonical"
+          href={`https://www.${domain}/terms-and-conditions`}
+        />
+        {/* <meta name="robots" content="noindex" /> */}
         <meta name="theme-color" content="#008DE5" />
         <link rel="manifest" href="/manifest.json" />
         <meta httpEquiv="X-UA-Compatible" content="IE=edge" />
@@ -66,19 +76,19 @@ export default function About({
         <link
           rel="apple-touch-icon"
           sizes="180x180"
-          href={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${logo.file_name}`}
+          href={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${favicon}`}
         />
         <link
           rel="icon"
           type="image/png"
           sizes="32x32"
-          href={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${logo.file_name}`}
+          href={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${favicon}`}
         />
         <link
           rel="icon"
           type="image/png"
           sizes="16x16"
-          href={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${logo.file_name}`}
+          href={`${process.env.NEXT_PUBLIC_SITE_MANAGER}/images/${imagePath}/${favicon}`}
         />
       </Head>
 
@@ -89,59 +99,48 @@ export default function About({
               case "navbar":
                 return (
                   <Navbar
+                    key={index}
+                    logo={`${imagePath}/${logo.file_name}`}
+                    nav_type={nav_type}
+                    imagePath={imagePath}
                     blog_list={blog_list}
                     categories={categories}
-                    logo={`${imagePath}/${logo.file_name}`}
-                    project_id={project_id}
                     contact_details={contact_details}
                   />
                 );
-              case "banner":
+              case "breadcrumbs":
                 return (
-                  <AboutBanner image={`${imagePath}/${about_me.file_name}`} />
+                  <FullContainer key={index}>
+                    <Container>
+                      <Breadcrumbs breadcrumbs={breadcrumbs} className="py-7" />
+                    </Container>
+                  </FullContainer>
                 );
-
               case "text":
                 return (
-                  <FullContainer>
-                    <Container className="py-16">
-                      <div className="grid grid-cols-about gap-16 w-full">
-                        <div className={font2.className}>
-                          <p
-                            className={cn(
-                              "text-xs uppercase text-yellow-600",
-                              myFont.className
-                            )}
-                          >
-                            LIFESTYLE BLOGGER
-                          </p>
-                          <div
-                            className="prose-xl"
-                            dangerouslySetInnerHTML={{ __html: content }}
-                          />
-                        </div>
-                        <Rightbar
-                          page="about"
-                          contact_details={contact_details}
-                        />
-                      </div>
+                  <FullContainer key={index}>
+                    <Container>
+                      <div
+                        className="prose max-w-full w-full mb-5"
+                        dangerouslySetInnerHTML={{ __html: content }}
+                      />
                     </Container>
                   </FullContainer>
                 );
               case "footer":
                 return (
                   <Footer
+                    key={index}
                     blog_list={blog_list}
                     categories={categories}
-                    logo={`s${imagePath}/${logo?.file_name}`}
+                    logo={`${imagePath}/${logo?.file_name}`}
                     project_id={project_id}
                     imagePath={imagePath}
-                    contact_details={contact_details}
-                    copyright={copyright}
                     about_me={about_me}
+                    copyright={copyright}
+                    contact_details={contact_details}
                   />
                 );
-
               default:
                 return null;
             }
@@ -179,6 +178,18 @@ export default function About({
               ],
             },
             {
+              "@type": "WebSite",
+              "@id": `http://${domain}/#website`,
+              url: `http://${domain}/`,
+              name: domain,
+              description: meta?.description,
+              inLanguage: "en-US",
+              publisher: {
+                "@type": "Organization",
+                "@id": `http://${domain}`,
+              },
+            },
+            {
               "@type": "ItemList",
               url: `http://${domain}`,
               name: "blog",
@@ -187,9 +198,20 @@ export default function About({
                 position: index + 1,
                 item: {
                   "@type": "Article",
-                  url: `http://${domain}/${blog?.article_category?.name}/${blog.key}`,
+                  url: `http://${domain}/${
+                    blog?.article_category?.name
+                  }/${blog.title?.replaceAll(" ", "-")?.toLowerCase()}`,
                   name: blog.title,
                 },
+              })),
+            },
+            {
+              "@type": "BreadcrumbList",
+              itemListElement: breadcrumbs.map((breadcrumb, index) => ({
+                "@type": "ListItem",
+                position: index + 1,
+                name: breadcrumb.label,
+                item: `http://${domain}${breadcrumb.url}`,
               })),
             },
           ],
@@ -202,60 +224,42 @@ export default function About({
 export async function getServerSideProps({ req, query }) {
   const domain = getDomain(req?.headers?.host);
 
-  const logo = await callBackendApi({
-    domain,
-    query,
-    type: "logo",
-  });
+  const meta = await callBackendApi({ domain, query, type: "meta_terms" });
+  const logo = await callBackendApi({ domain, query, type: "logo" });
   const favicon = await callBackendApi({ domain, query, type: "favicon" });
-  const banner = await callBackendApi({ domain, query, type: "banner" });
-  const footer_text = await callBackendApi({
-    domain,
-    query,
-    type: "footer_text",
-  });
-  const contact_details = await callBackendApi({
-    domain,
-    query,
-    type: "contact_details",
-  });
-  const copyright = await callBackendApi({
-    domain,
-    query,
-    type: "copyright",
-  });
   const blog_list = await callBackendApi({ domain, query, type: "blog_list" });
   const categories = await callBackendApi({
     domain,
     query,
     type: "categories",
   });
-  const meta = await callBackendApi({ domain, query, type: "meta_tags" });
-  const about_me = await callBackendApi({ domain, query, type: "about_me" });
+  const contact_details = await callBackendApi({
+    domain,
+    query,
+    type: "contact_details",
+  });
+  const terms = await callBackendApi({ domain, query, type: "terms" });
   const layout = await callBackendApi({ domain, type: "layout" });
-  const tag_list = await callBackendApi({ domain, type: "tag_list" });
   const nav_type = await callBackendApi({ domain, type: "nav_type" });
 
   let project_id = logo?.data[0]?.project_id || null;
-  let imagePath = await getImagePath(project_id, domain);
+  let imagePath = null;
+  imagePath = await getImagePath(project_id, domain);
+  
 
   return {
     props: {
       domain,
       imagePath,
-      meta: meta?.data[0]?.value || null,
+      logo: logo?.data[0] || null,
+      about_me: about_me?.data[0] || null,
       favicon: favicon?.data[0]?.file_name || null,
-      logo: logo?.data[0],
       layout: layout?.data[0]?.value || null,
-      banner: banner.data[0] || null,
-      blog_list: blog_list.data[0].value,
+      blog_list: blog_list?.data[0]?.value || [],
       categories: categories?.data[0]?.value || null,
-      footer_text: footer_text?.data[0]?.value || null,
-      copyright: copyright?.data[0]?.value || null,
-      domain: domain === "hellospace.us" ? req?.headers?.host : domain,
-      about_me: about_me.data[0] || null,
-      contact_details: contact_details.data[0].value,
-      tag_list: tag_list?.data[0]?.value || null,
+      meta: meta?.data[0]?.value || null,
+      contact_details: contact_details?.data[0]?.value || null,
+      terms: terms?.data[0]?.value || "",
       nav_type: nav_type?.data[0]?.value || {},
     },
   };
